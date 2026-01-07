@@ -1,0 +1,32 @@
+@import 'tailwindcss';
+
+/* You can add your global "System" styles here later */
+body {
+  @apply bg-[#0a0e14] text-[#e0fbfc] selection:bg-[#00f2ff]/30;
+  font-family: 'Inter', sans-serif;
+}
+
+@theme {
+  --color-system-cyan: #00f2ff;
+  --color-system-bg: #0a0e14;
+
+  @keyframes scanline {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(100%);
+    }
+  }
+}
+
+.system-window {
+  @apply relative overflow-hidden rounded-lg border-2 border-system-cyan/50 
+         bg-system-bg/90 backdrop-blur-md shadow-[0_0_20px_rgba(0,242,255,0.2)];
+}
+
+.scanline-overlay {
+  background: linear-gradient(to bottom, transparent 50%, rgba(0, 242, 255, 0.05) 50%);
+  background-size: 100% 4px;
+  animation: scanline 10s linear infinite;
+}

@@ -13,53 +13,49 @@ interface Stats {
 
 interface PlayerState {
   name: string;
-  gender: 'Male' | 'Female' | 'Unknown';
-  portrait: string | null;
-  classTitle: string;
+  gender: 'Male' | 'Female';
+  portrait: string;
   isAwakened: boolean;
   level: number;
-  exp: number;
+  // We remove classTitle for now, or set it to "???"
+  classTitle: string;
   stats: Stats;
   hp: number;
   maxHp: number;
   mp: number;
   maxMp: number;
-  ppPool: number;
-  // Actions
-  awaken: (data: { name: string; gender: any; portrait: string; classTitle: string; stats: Stats }) => void;
-  gainExp: (amount: number) => void;
+
+  awaken: (name: string, gender: 'Male' | 'Female', portrait: string) => void;
 }
 
+const BASE_STATS = { str: 5, vit: 5, int: 5, agi: 5, dex: 5, luk: 5, wil: 5, sen: 5 };
+
 export const usePlayerStore = create<PlayerState>((set) => ({
-  name: 'Vessel #001',
-  gender: 'Unknown',
-  portrait: null,
-  classTitle: '',
+  name: 'Unknown',
+  gender: 'Male',
+  portrait: 'p1',
   isAwakened: false,
   level: 0,
-  exp: 0,
-  stats: { str: 0, vit: 0, int: 0, agi: 0, dex: 0, luk: 0, wil: 0, sen: 0 },
-  hp: 10,
-  maxHp: 10,
-  mp: 5,
-  maxMp: 5,
-  ppPool: 0,
+  classTitle: 'Awakened',
+  stats: BASE_STATS,
+  hp: 50,
+  maxHp: 50,
+  mp: 40,
+  maxMp: 40,
 
-  awaken: (data) =>
-    set(() => ({
+  awaken: (name, gender, portrait) =>
+    set({
       isAwakened: true,
-      name: data.name,
-      gender: data.gender,
-      portrait: data.portrait,
-      classTitle: data.classTitle,
+      name,
+      gender,
+      portrait,
+      classTitle: 'Novice', // Or "Survivor"
       level: 1,
-      stats: data.stats,
-      hp: data.stats.vit * 10,
-      maxHp: data.stats.vit * 10,
-      mp: data.stats.int * 8,
-      maxMp: data.stats.int * 8,
-      ppPool: Math.floor(data.stats.wil / 5) + 3,
-    })),
-
-  gainExp: (amount) => set((state) => ({ exp: state.exp + amount })),
+      stats: BASE_STATS,
+      // Recalculate derived stats
+      hp: BASE_STATS.vit * 10,
+      maxHp: BASE_STATS.vit * 10,
+      mp: BASE_STATS.int * 8,
+      maxMp: BASE_STATS.int * 8,
+    }),
 }));

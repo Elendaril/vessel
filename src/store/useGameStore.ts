@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type GamePhase = 'CREATION' | 'TUTORIAL' | 'HUB' | 'DUNGEON' | 'COMBAT';
+type GamePhase = 'CREATION' | 'TUTORIAL_INTRO' | 'COMBAT' | 'HUB' | 'DUNGEON';
 
 interface GameState {
   phase: GamePhase;

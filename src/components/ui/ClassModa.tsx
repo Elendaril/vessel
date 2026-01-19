@@ -15,7 +15,7 @@ export default function ClassModal({ selectedClass, onClose, onConfirm }: ClassM
     fullMark: 10,
   }));
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-6">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-md p-6">
       {/* Background click to close */}
       <div className="absolute inset-0" onClick={onClose} />
 

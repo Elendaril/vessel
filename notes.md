@@ -1,0 +1,63 @@
+Skills:
+
+- flat damage, scales with STR for melee, DEX for ranged, INT for magic
+- magic and physical types
+- some skills have status effects (bleed, burn, freeze, stun, poison)
+- some skills have area effects (hit multiple enemies)
+- some skills have buffs/debuffs (increase own DEF, decrease enemy ATK)
+- skills cost MP to use
+- skills can have cooldowns before they can be used again
+- players can equip a limited number of skills at a time
+- skills can be leveled up to increase their effectiveness
+- skills can be unlocked through progression or quests
+- skills can have elements (fire, ice, lightning, earth, wind, water, light, dark)
+- enemies can have resistances or weaknesses to certain skill types or elements
+- skills can be comboed for extra effects (e.g. using a stun skill followed by a high-damage skill)
+- players can find or craft skill-enhancing items (e.g. scrolls, tomes)
+- some skills can be passive, providing constant benefits without activation
+- players can customize skill hotkeys for quick access during combat
+- skills can have visual and sound effects to enhance immersion
+- players can practice skills to improve proficiency and reduce MP cost or cooldown
+- some skills can be learned from NPC trainers or through special events
+- physical and magical damage types interact differently with enemy defenses (armor vs. magic resist)
+- skill gain experience and level up separately from player level
+- skills can be fused or combined to create new, more powerful skills
+- some equipment can enhance specific skills or skill types
+- some equipment can grant new skills when equipped
+- some skills can be used outside of combat for exploration or puzzle-solving (e.g. teleportation, lockpicking)
+- some skills can be interrupted by enemy actions, requiring strategic timing for use
+- players can view detailed skill descriptions and stats in a dedicated skill menu
+- skills can have different targeting options (single target, area of effect, self-targeted)
+- some skills can use hp instead of mp as a resource
+
+Player:
+
+- players have stats: STR, VIT, INT, AGI, DEX, LUK, WIL, SEN
+- stats affect various aspects of gameplay (e.g. STR increases physical damage, VIT increases max HP)
+- players can level up and allocate stat points to customize their build
+- players have HP and MP, which can be restored through items or resting
+- players can equip weapons and armor that affect their stats and abilities
+- players can carry an inventory of items, including consumables, equipment, and quest items
+- players can gain experience points (EXP) from defeating enemies and completing quests
+- players can have status effects (buffs and debuffs) that affect their performance in combat
+- players can interact with NPCs for quests, trading, and story progression
+- players can save and load their progress
+- players can explore different environments and encounter various enemies
+- players can use skills and abilities in combat
+- players can customize their appearance and equipment
+- players can form parties with NPCs or other players (if multiplayer)
+- players can access a journal or quest log to track their objectives
+- players can unlock new areas and content as they progress through the game
+- players can find hidden secrets and collectibles throughout the game world
+- players can fast travel between discovered locations
+- players can adjust game settings (audio, graphics, controls) to their preference
+- players can view detailed character stats and equipment in a dedicated menu
+- players can respawn at checkpoints or save points upon death
+- players can earn achievements or trophies for completing specific challenges
+- players can participate in side quests and optional content for additional rewards
+- players have limited pool of points required to activate passive abilities or perks
+- players can awaken special abilities or transformations through story progression
+- players can consume MP to use skills and abilities
+- players can equip a limited number of skills at a time
+- players can choose a class or specialization that affects their starting stats and abilities
+- players can unlock new skills as they level up or progress through the game

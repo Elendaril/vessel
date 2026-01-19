@@ -24,13 +24,14 @@ interface PlayerState {
   maxHp: number;
   mp: number;
   maxMp: number;
-
+  equippedSkills: string[];
   awaken: (name: string, gender: 'Male' | 'Female', portrait: string) => void;
+  consumeMp: (amount: number) => boolean;
 }
 
 const BASE_STATS = { str: 5, vit: 5, int: 5, agi: 5, dex: 5, luk: 5, wil: 5, sen: 5 };
 
-export const usePlayerStore = create<PlayerState>((set) => ({
+export const usePlayerStore = create<PlayerState>((set, get) => ({
   name: 'Unknown',
   gender: 'Male',
   portrait: 'p1',
@@ -42,7 +43,15 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   maxHp: 50,
   mp: 40,
   maxMp: 40,
-
+  equippedSkills: ['basic_strike', 'quick_slash', 'heavy_slam'],
+  consumeMp: (amount) => {
+    const { mp } = get();
+    if (mp >= amount) {
+      set({ mp: mp - amount });
+      return true;
+    }
+    return false;
+  },
   awaken: (name, gender, portrait) =>
     set({
       isAwakened: true,

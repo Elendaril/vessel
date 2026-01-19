@@ -29,12 +29,26 @@ export const useDungeonStore = create<DungeonState>((set, get) => ({
         isCleared: true,
         isVisible: true,
       },
+      room_elite_1: {
+        // New Side Room
+        id: 'room_elite_1',
+        type: 'COMBAT', // We can add 'ELITE' type later
+        name: 'Wolf Den',
+        description: 'A massive Wolf guards a pile of bones.',
+        // BACKTRACKING: Must connect back to the Fork
+        connections: ['room_combat_1'],
+        x: 20,
+        y: 55, // To the left
+        isCleared: false,
+        isVisible: false,
+        contents: { enemyId: 'wolf_elite' },
+      },
       room_combat_1: {
         id: 'room_combat_1',
         type: 'COMBAT',
         name: 'Rat Nest',
         description: 'You hear squeaking in the shadows.',
-        connections: ['room_chest_1'],
+        connections: ['room_start', 'room_chest_1', 'room_elite_1'],
         x: 25,
         y: 55,
         isCleared: false,
@@ -46,8 +60,8 @@ export const useDungeonStore = create<DungeonState>((set, get) => ({
         type: 'TREASURE',
         name: 'Hidden Stash',
         description: 'An old adventurer left this behind.',
-        connections: ['room_boss'],
-        x: 75,
+        connections: ['room_combat_1', 'room_boss'],
+        x: 80,
         y: 55,
         isCleared: false,
         isVisible: false, // Hidden until you reach previous room
@@ -57,7 +71,7 @@ export const useDungeonStore = create<DungeonState>((set, get) => ({
         type: 'BOSS',
         name: 'Slime King',
         description: 'A massive gelatinous cube blocks the exit.',
-        connections: [],
+        connections: ['room_chest_1'],
         x: 50,
         y: 20,
         isCleared: false,

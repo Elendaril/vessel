@@ -2,45 +2,59 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCombatStore } from '../../store/useCombatStore';
 import { usePlayerStore } from '../../store/usePlayerStore';
-import { useGameStore } from '../../store/useGameStore'; // Import 1
-import { useDungeonStore } from '../../store/useDungeonStore'; // Import 2
+import { useGameStore } from '../../store/useGameStore';
+import { useDungeonStore } from '../../store/useDungeonStore';
 import { ENEMY_DB } from '../../data/enemies';
 import TurnTimeline from '../ui/TurnTimeline';
 import { SKILL_DB } from '../../data/skills';
 
 export default function CombatView() {
+  // --- 1. HOOKS (Must be declared at the top) ---
   const { enemy, logs, turnQueue, initializeCombat, performPlayerAction, performEnemyAction } = useCombatStore();
 
-  // FIX 1: Combined destructuring into one line
   const { hp, maxHp, mp, maxMp, name, equippedSkills } = usePlayerStore();
-
-  // 1. Initialize Combat
-  useEffect(() => {
-    initializeCombat(ENEMY_DB['slime_weak']);
-  }, []);
 
   const { setPhase } = useGameStore();
   const { completeRoom } = useDungeonStore();
 
-  // 2. AI Turn Handler
+  // --- 2. LOGIC & DERIVED STATE ---
+  // Define isVictory early so hooks can use it
+  const isVictory = enemy ? enemy.hp <= 0 : false;
+  const isPlayerTurn = turnQueue.length > 0 && turnQueue[0].owner === 'PLAYER';
+
+  // --- 3. EFFECTS ---
+
+  // Initialize Combat
   useEffect(() => {
+    if (!enemy) {
+      // For now, hardcode the enemy. Later, this can come from props or dungeon store.
+      initializeCombat(ENEMY_DB['slime_weak']);
+    }
+  }, []); // Run once on mount
+
+  // AI Turn Handler
+  useEffect(() => {
+    // STOP if the enemy is dead
+    if (isVictory) return;
+
     if (turnQueue.length > 0 && turnQueue[0].owner === 'ENEMY') {
       const timer = setTimeout(() => {
         performEnemyAction();
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [turnQueue]);
+  }, [turnQueue, isVictory]); // Re-run when queue changes or victory state updates
 
-  if (!enemy) return <div className="text-white p-10">Loading Encounter...</div>;
-
-  const isPlayerTurn = turnQueue.length > 0 && turnQueue[0].owner === 'PLAYER';
-  const isVictory = enemy.hp <= 0;
+  // --- 4. HANDLERS ---
 
   const handleVictory = () => {
-    completeRoom(); // Mark current room as cleared
-    setPhase('DUNGEON'); // Go back to map
+    completeRoom(); // Mark room as cleared in Dungeon Store
+    setPhase('DUNGEON'); // Switch view back to Map
   };
+
+  // --- 5. RENDER ---
+
+  if (!enemy) return <div className="text-white p-10">Loading Encounter...</div>;
 
   return (
     <div className="w-full h-full flex font-mono relative">
@@ -51,7 +65,11 @@ export default function CombatView() {
       <div className="flex-1 flex flex-col p-4 gap-4">
         {/* --- ENEMY SECTION --- */}
         <div className="flex flex-col items-center justify-center relative py-6 min-h-[200px]">
-          <motion.div animate={!isPlayerTurn ? { scale: [1, 1.1, 1] } : {}} className={`w-32 h-32 rounded-full ${enemy.sprite} blur-sm flex items-center justify-center shadow-[0_0_30px_#10b981]`}>
+          <motion.div
+            // Animate only if it's NOT player's turn and enemy is alive
+            animate={!isPlayerTurn && !isVictory ? { scale: [1, 1.1, 1] } : {}}
+            className={`w-32 h-32 rounded-full ${enemy.sprite} blur-sm flex items-center justify-center shadow-[0_0_30px_#10b981]`}
+          >
             <div className="w-20 h-20 bg-white/20 rounded-full animate-pulse" />
           </motion.div>
 
@@ -60,6 +78,7 @@ export default function CombatView() {
               <span>{enemy.name}</span>
               <span>LVL {enemy.level}</span>
             </div>
+            {/* Enemy HP Bar */}
             <div className="h-4 bg-gray-900 border border-red-500/30 rounded-sm relative overflow-hidden">
               <motion.div initial={{ width: '100%' }} animate={{ width: `${(enemy.hp / enemy.maxHp) * 100}%` }} className="absolute top-0 left-0 h-full bg-red-500" />
             </div>
@@ -68,6 +87,7 @@ export default function CombatView() {
             </p>
           </div>
         </div>
+
         {/* --- LOGS --- */}
         <div className="flex-1 bg-black/40 border-y border-system-cyan/20 p-4 overflow-hidden relative min-h-[120px]">
           <div className="space-y-1">
@@ -86,6 +106,7 @@ export default function CombatView() {
             </AnimatePresence>
           </div>
         </div>
+
         {/* --- CONTROLS --- */}
         <div className="grid grid-cols-12 gap-4 h-40">
           {/* Player HP Panel */}
@@ -122,19 +143,17 @@ export default function CombatView() {
               if (!skill) return null;
 
               const canAfford = mp >= skill.mpCost;
+              // Disable if not turn, too expensive, OR fight is over
+              const isDisabled = !isPlayerTurn || !canAfford || isVictory;
 
               return (
                 <button
                   key={skillId}
                   onClick={() => performPlayerAction(skillId)}
-                  disabled={!isPlayerTurn || !canAfford}
+                  disabled={isDisabled}
                   className={`
                     flex flex-col items-center justify-center gap-1 p-2 border transition-all relative overflow-hidden group
-                    ${
-                      canAfford && isPlayerTurn
-                        ? 'border-system-cyan/30 bg-system-cyan/5 hover:bg-system-cyan/20 hover:border-system-cyan'
-                        : 'border-gray-800 bg-gray-900 opacity-50 cursor-not-allowed'
-                    }
+                    ${!isDisabled ? 'border-system-cyan/30 bg-system-cyan/5 hover:bg-system-cyan/20 hover:border-system-cyan' : 'border-gray-800 bg-gray-900 opacity-50 cursor-not-allowed'}
                   `}
                 >
                   <span className="font-bold uppercase tracking-widest text-xs z-10">{skill.name}</span>
@@ -145,24 +164,48 @@ export default function CombatView() {
                   </div>
 
                   {/* Hover Effect */}
-                  <div className="absolute inset-0 bg-system-cyan/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                  {!isDisabled && <div className="absolute inset-0 bg-system-cyan/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />}
                 </button>
               );
             })}
           </div>
-        </div>{' '}
-        {/* FIX 2: Closed the grid container */}
+        </div>
       </div>
 
-      {/* --- VICTORY OVERLAY --- */}
+      {/* --- VICTORY OVERLAY (Fixed Position) --- */}
       <AnimatePresence>
         {isVictory && (
-          <div className="...">
-            <h1 className="...">VICTORY</h1>
-            <button onClick={handleVictory} className="...">
-              Return to Map
-            </button>
-          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            // FIXED: Use fixed positioning to cover the entire screen
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', bounce: 0.5 }}
+              className="text-center space-y-6 p-10 border-y-4 border-yellow-500 bg-yellow-500/5 w-full max-w-2xl"
+            >
+              <h1 className="text-8xl font-black text-yellow-500 italic tracking-tighter drop-shadow-[0_0_30px_rgba(234,179,8,0.5)]">VICTORY</h1>
+
+              <div className="flex justify-center gap-8 text-yellow-200 font-mono text-sm uppercase tracking-widest">
+                <div>
+                  EXP: <span className="text-white font-bold">+{enemy.expReward}</span>
+                </div>
+                <div>
+                  Gold: <span className="text-white font-bold">+50</span>
+                </div>
+              </div>
+
+              <button
+                onClick={handleVictory}
+                className="px-12 py-4 bg-yellow-500 text-black font-black uppercase tracking-[0.2em] hover:bg-white hover:scale-105 transition-all shadow-[0_0_20px_rgba(234,179,8,0.4)]"
+              >
+                Collect Rewards
+              </button>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
